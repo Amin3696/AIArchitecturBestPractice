@@ -117,6 +117,35 @@
 
 ---
 
+## State Model
+
+### Appointment Statuses
+
+- `BOOKED`
+- `CANCELLED`
+- `COMPLETED`
+- `NO_SHOW`
+
+### Visit Statuses
+
+- `NOT_STARTED`
+- `WAITING`
+- `IN_PROGRESS`
+- `COMPLETED`
+- `NO_SHOW`
+
+### Key Transition Rules
+
+- `Appointment Status` و `Visit Status` دو state machine جدا هستند.
+- Appointment در زمان ایجاد با `status = BOOKED` و `visitStatus = NOT_STARTED` ساخته می‌شود.
+- `VisitStatus = COMPLETED` باید به `AppointmentStatus = COMPLETED` منجر شود.
+- `VisitStatus = NO_SHOW` باید به `AppointmentStatus = NO_SHOW` منجر شود.
+- `AppointmentStatus = CANCELLED` terminal است و بعد از آن visit نباید پیشروی کند.
+
+مرجع کامل transitionها، guardها و actorهای مجاز در `docs/architecture/domain/state-machines.md` آمده است.
+
+---
+
 ## Inbound Interfaces
 
 - application service برای رزرو توسط بیمار

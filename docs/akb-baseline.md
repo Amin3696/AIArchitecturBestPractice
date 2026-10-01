@@ -90,6 +90,7 @@
 | `docs/architecture/c4models/02-container.md` | 0.1 | Working Draft | Supporting | نمای کانتینرها و اجزای اجرایی |
 | `docs/architecture/domain/context-map.md` | 0.5 | Working Draft | Supporting | نقشه فعلی bounded contextها و روابط آن‌ها |
 | `docs/architecture/domain/domain-context.md` | 0.5 | Working Draft | Supporting | دامنه، capabilityها و مرز مسئولیت‌ها |
+| `docs/architecture/domain/state-machines.md` | 0.5 | Working Draft | Supporting | مدل وضعیت‌های Appointment، Visit و Slot |
 | `docs/architecture/domain/ubiquitous-language.md` | 0.5 | Working Draft | Supporting | واژگان مشترک پروژه |
 | `docs/architecture/domain/contexts/appointment/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context رزرو و lifecycle نوبت |
 | `docs/architecture/domain/contexts/doctor/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context پزشک، schedule و slot |

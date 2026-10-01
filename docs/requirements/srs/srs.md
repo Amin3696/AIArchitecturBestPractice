@@ -320,14 +320,31 @@ Slot دارای نوبت فعال نباید در نتایج زمان‌های �
 
 ## BR-009 — وضعیت نوبت
 
-وضعیت‌های اصلی:
+در baseline فعلی، `Appointment Status` و `Visit Status` دو مفهوم جدا هستند.
 
-* AVAILABLE
-* RESERVED
-* CONFIRMED
+### Appointment Status (MVP)
+
+* BOOKED
 * CANCELLED
 * COMPLETED
 * NO_SHOW
+
+### Visit Status
+
+* NOT_STARTED
+* WAITING
+* IN_PROGRESS
+* COMPLETED
+* NO_SHOW
+
+### Slot Status
+
+* AVAILABLE
+* RESERVED
+* INACTIVE
+* EXPIRED
+
+`CONFIRMED` در baseline فعلی جزو وضعیت‌های MVP نیست و برای نسخه‌های آینده رزرو شده است.
 
 ---
 
@@ -1181,7 +1198,7 @@ cancelledAt
 3. گزینه لغو را انتخاب می‌کند.
 4. سیستم Cancellation Policy را بررسی می‌کند.
 5. وضعیت Appointment به `CANCELLED` تغییر می‌کند.
-6. Slot دوباره آزاد می‌شود.
+6. اگر guardهای availability برقرار باشند، Slot دوباره قابل رزرو می‌شود.
 7. Notification ارسال می‌شود.
 
 ---
@@ -1202,25 +1219,82 @@ cancelledAt
 
 ---
 
-# 41. State Machine نوبت
+# 41. State Machines
 
-```text
-AVAILABLE
-    |
-    | Reserve
-    v
-RESERVED
-    |
-    | Confirm
-    v
-CONFIRMED
-    |
-    +-------> CANCELLED
-    |
-    +-------> COMPLETED
-    |
-    +-------> NO_SHOW
+## 41.1 Appointment State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> BOOKED : book
+    BOOKED --> CANCELLED : cancel
+    BOOKED --> COMPLETED : complete
+    BOOKED --> NO_SHOW : markNoShow
+    CANCELLED --> [*]
+    COMPLETED --> [*]
+    NO_SHOW --> [*]
 ```
+
+| From | To | Trigger | Allowed Actors | Guards |
+| --- | --- | --- | --- | --- |
+| none | `BOOKED` | booking | `Patient`, `Receptionist`, `Clinic Admin` | Patient معتبر؛ Doctor فعال؛ Slot فعال و آینده؛ Slot بدون Appointment فعال؛ بیمار برای همان Doctor در همان روز Appointment فعال دیگری نداشته باشد |
+| `BOOKED` | `CANCELLED` | cancellation | `Patient`, `Receptionist`, `Clinic Admin` | اگر actor بیمار است، `Cancellation Window` باید رعایت شود |
+| `BOOKED` | `COMPLETED` | visit completion | `Doctor`, `Receptionist`, `Clinic Admin` | Appointment لغوشده نباشد |
+| `BOOKED` | `NO_SHOW` | no-show marking | `Doctor`, `Receptionist`, `Clinic Admin` | زمان مراجعه رسیده یا گذشته باشد |
+
+## 41.2 Visit State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> NOT_STARTED
+    NOT_STARTED --> WAITING : checkIn
+    WAITING --> IN_PROGRESS : startVisit
+    IN_PROGRESS --> COMPLETED : finishVisit
+    NOT_STARTED --> NO_SHOW : markNoShow
+    WAITING --> NO_SHOW : markNoShow
+```
+
+| From | To | Trigger | Allowed Actors | Guards |
+| --- | --- | --- | --- | --- |
+| none | `NOT_STARTED` | appointment creation | system | همزمان با ایجاد Appointment |
+| `NOT_STARTED` | `WAITING` | check-in | `Receptionist`, `Doctor`, `Clinic Admin` | Appointment در وضعیت `BOOKED` باشد |
+| `WAITING` | `IN_PROGRESS` | start visit | `Doctor`, `Receptionist`, `Clinic Admin` | Appointment در وضعیت `BOOKED` باشد |
+| `IN_PROGRESS` | `COMPLETED` | finish visit | `Doctor`, `Receptionist`, `Clinic Admin` | خدمت پایان یافته باشد |
+| `NOT_STARTED` | `NO_SHOW` | no-show marking | `Doctor`, `Receptionist`, `Clinic Admin`, system job | بیمار check-in نشده و زمان مراجعه گذشته باشد |
+| `WAITING` | `NO_SHOW` | no-show marking | `Doctor`, `Receptionist`, `Clinic Admin` | policy کلینیک اجازه دهد |
+
+Rule:
+
+* `Visit Status = COMPLETED` باید `Appointment Status = COMPLETED` ایجاد کند.
+* `Visit Status = NO_SHOW` باید `Appointment Status = NO_SHOW` ایجاد کند.
+
+## 41.3 Slot State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> AVAILABLE : create/generate
+    AVAILABLE --> RESERVED : book
+    AVAILABLE --> INACTIVE : deactivate
+    AVAILABLE --> EXPIRED : timePasses
+    RESERVED --> AVAILABLE : eligibleCancelOrReschedule
+    RESERVED --> INACTIVE : deactivate
+    RESERVED --> EXPIRED : timePasses
+    INACTIVE --> AVAILABLE : reactivate
+    INACTIVE --> EXPIRED : timePasses
+```
+
+| From | To | Trigger | Allowed Actors | Guards |
+| --- | --- | --- | --- | --- |
+| none | `AVAILABLE` | slot creation/generation | `Clinic Admin`, authorized `Doctor`, system | Doctor فعال؛ هم‌پوشانی نداشته باشد؛ Slot آینده باشد |
+| `AVAILABLE` | `RESERVED` | successful booking | system | Appointment فعال روی Slot ایجاد شده باشد |
+| `AVAILABLE` | `INACTIVE` | deactivate slot | `Clinic Admin`, authorized `Doctor` | — |
+| `AVAILABLE` | `EXPIRED` | time passes | system | `scheduledStart <= now` |
+| `RESERVED` | `AVAILABLE` | cancellation/reschedule | system | Appointment فعال دیگر وجود نداشته باشد؛ Slot آینده و فعال باشد؛ Doctor فعال باشد |
+| `RESERVED` | `INACTIVE` | deactivate slot | `Clinic Admin`, authorized `Doctor` | — |
+| `RESERVED` | `EXPIRED` | time passes | system | `scheduledStart <= now` |
+| `INACTIVE` | `AVAILABLE` | reactivate slot | `Clinic Admin`, authorized `Doctor` | Slot آینده باشد؛ Doctor فعال باشد؛ Appointment فعال نداشته باشد |
+| `INACTIVE` | `EXPIRED` | time passes | system | `scheduledStart <= now` |
+
+مرجع دامنه‌ای تفصیلی برای این state model در `docs/architecture/domain/state-machines.md` ثبت شده است.
 
 ---
 
@@ -1491,17 +1565,16 @@ Future scalability
 
 1. آیا سیستم برای یک کلینیک است یا چند کلینیک؟
 2. آیا یک پزشک می‌تواند در چند کلینیک فعالیت کند؟
-5. آیا پرداخت آنلاین وجود دارد؟
-6. آیا نوبت بدون Login قابل مشاهده است؟
-7. آیا OTP لازم است؟
-8. SMS Provider چیست؟
-9. آیا Appointment نیاز به تأیید پزشک دارد؟
-10. آیا Slotها به‌صورت Dynamic تولید می‌شوند یا از قبل ایجاد می‌شوند؟
-11. آیا نوبت‌ها می‌توانند ظرفیت بیشتر از یک نفر داشته باشند؟
-12. آیا پزشک می‌تواند Schedule خودش را تغییر دهد؟
-13. Timezone رسمی سیستم چیست؟
-14. سیاست نگهداری اطلاعات بیماران چیست؟
-15. آیا نیاز به GDPR/قوانین محلی خاص وجود دارد؟
+3. آیا پرداخت آنلاین وجود دارد؟
+4. آیا نوبت بدون Login قابل مشاهده است؟
+5. آیا OTP لازم است؟
+6. SMS Provider چیست؟
+7. آیا Slotها به‌صورت Dynamic تولید می‌شوند یا از قبل ایجاد می‌شوند؟
+8. آیا نوبت‌ها می‌توانند ظرفیت بیشتر از یک نفر داشته باشند؟
+9. آیا پزشک می‌تواند Schedule خودش را تغییر دهد؟
+10. Timezone رسمی سیستم چیست؟
+11. سیاست نگهداری اطلاعات بیماران چیست؟
+12. آیا نیاز به GDPR/قوانین محلی خاص وجود دارد؟
 
 ---
 

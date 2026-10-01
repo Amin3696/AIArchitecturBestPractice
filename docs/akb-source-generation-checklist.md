@@ -38,10 +38,10 @@
 
 ### 4) مدل وضعیت‌ها و جریان‌های اصلی
 
-- [ ] state machine کامل `Appointment` تعریف شود.
-- [ ] state machine کامل `Slot` تعریف شود.
-- [ ] مشخص شود `Visit Status` از `Appointment Status` جداست یا خیر.
-- [ ] transitionها، guardها و actor مجاز برای هر تغییر وضعیت ثبت شود.
+- [x] state machine کامل `Appointment` تعریف شود.
+- [x] state machine کامل `Slot` تعریف شود.
+- [x] مشخص شود `Visit Status` از `Appointment Status` جداست یا خیر.
+- [x] transitionها، guardها و actor مجاز برای هر تغییر وضعیت ثبت شود.
 
 ### 5) نقش‌ها و مجوزها
 

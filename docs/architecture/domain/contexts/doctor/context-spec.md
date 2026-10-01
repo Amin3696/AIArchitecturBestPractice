@@ -71,6 +71,27 @@
 
 ---
 
+## Slot State Model
+
+### Slot Statuses
+
+- `AVAILABLE`
+- `RESERVED`
+- `INACTIVE`
+- `EXPIRED`
+
+### Key Transition Rules
+
+- Slot تازه ایجادشده یا تولیدشده در صورت معتبر بودن با `AVAILABLE` شروع می‌شود.
+- رزرو موفق Slot را به `RESERVED` می‌برد.
+- لغو/جابجایی فقط در صورت برقرار بودن guardها می‌تواند Slot را دوباره `AVAILABLE` کند.
+- `INACTIVE` یعنی Slot عمداً از عرضه خارج شده است، نه اینکه لزوماً زمانش گذشته باشد.
+- `EXPIRED` terminal است.
+
+مرجع کامل transitionها، guardها و actorهای مجاز در `docs/architecture/domain/state-machines.md` آمده است.
+
+---
+
 ## Commands
 
 - `CreateDoctor`
