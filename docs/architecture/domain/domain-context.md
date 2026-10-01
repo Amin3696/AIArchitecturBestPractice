@@ -130,3 +130,12 @@
 - `Identity/Access` فعلاً به‌صورت context مستقل مدل نشده و در baseline دامنه خارج از مرز این سند است.
 - `Reporting` فعلاً capability ثانویه است و به‌عنوان consumer read model از contextهای اصلی دیده می‌شود.
 - `Payment` و `Multi-Clinic` در MVP خارج از محدوده هستند و در این مدل دامنه وارد نشده‌اند.
+
+---
+
+## 10. Access Boundary Notes
+
+- `Patient` و `Doctor` با ownership-based access کنترل می‌شوند.
+- `Receptionist` و `Clinic Admin` role-based business actors هستند.
+- `System Admin` بازیگر فنی/امنیتی است و به‌صورت پیش‌فرض در flowهای روزمره booking وارد نمی‌شود.
+- مرجع کامل role/permission matrix در `docs/architecture/domain/access-control-matrix.md` قرار دارد.

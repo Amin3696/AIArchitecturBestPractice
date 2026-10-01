@@ -45,9 +45,9 @@
 
 ### 5) نقش‌ها و مجوزها
 
-- [ ] ماتریس کامل `Role -> Permission` تهیه شود.
-- [ ] مرز اختیارات `Patient`, `Doctor`, `Receptionist`, `Clinic Admin`, `System Admin` مشخص شود.
-- [ ] موارد override مانند لغو/جابجایی توسط پذیرش یا مدیر شفاف شود.
+- [x] ماتریس کامل `Role -> Permission` تهیه شود.
+- [x] مرز اختیارات `Patient`, `Doctor`, `Receptionist`, `Clinic Admin`, `System Admin` مشخص شود.
+- [x] موارد override مانند لغو/جابجایی توسط پذیرش یا مدیر شفاف شود.
 
 ### 6) API contractهای واقعی
 
