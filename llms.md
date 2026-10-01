@@ -1,41 +1,73 @@
-# سیستم نوبت دهی کلینیک  
+# سیستم نوبت‌دهی کلینیک
 
+این سند خلاصه فشرده و به‌روز پروژه برای استفاده ابزارهای هوش مصنوعی و توسعه‌دهندگان است. هرگونه تولید کد، بازبینی طراحی یا پیشنهاد پیاده‌سازی باید با اسناد authoritative پروژه هم‌راستا باشد.
 
+## وضعیت کلی
 
+- سبک معماری: `Modular Monolith`
+- دامنه MVP: نوبت‌دهی کلینیک برای یک کلینیک، بدون پرداخت آنلاین و بدون multi-clinic
+- مرجع رسمی نیازمندی‌ها: `docs/requirements/srs/srs.md`
+- مرجع baseline: `docs/akb-baseline.md`
 
-> یک سیستم یکپارچه رزرواسیون آنلاین درمانگاه با معماری Modular Monolith، متمرکز بر مدیریت همزمانی بالا و ایزوله‌سازی دامنه‌ها.  
-  
-این سند راهنمای فشرده معماری پروژه برای ابزارهای هوش مصنوعی و توسعه‌دهندگان است. هنگام تولید، بازبینی یا ریفکتور کد باید کلیه قوانین و خطوط قرمز زیر رعایت شوند.  
-  
-## مرزهای دامنه (Bounded Contexts)  
-- ‏**Appointment Context:** مسئول چرخه عمر رزرو، اعتبارسنجی ظرفیت اسلات‌ها، قفل موقت و ثبت نهایی.  
-- ‏**DoctorSchedule Context:** مدیریت تقویم کاری پزشکان، الگوهای شیفت، تعطیلات رسمی و ظرفیت ویزیت.  
-- ‏**Patient Context:** احراز هویت، نگهداری پروفایل و سوابق تماس بیماران.  
-- ‏**Doctor Context:** احراز هویت، نگهداری پروفایل و اطلاعات پزشکان.  
-- **  
-- ‏**Notification Context:** اطلاع‌رسانی ناهمگام پیامکی/ایمیلی (فقط به عنوان مصرف‌کننده رویدادها).  
-  
-## خطوط قرمز و قوانین پایدار معماری (Core Invariants)  
-  
-1. **استراتژی قفل رزرو (Locking Strategy):**  
-   - برای رزرو موقت اسلات، صرفاً از قفل توزیع‌شده Redis Distributed Lock با انقضای ۵ دقیقه استفاده شود.  
-   - اعمال قفل‌های مستقیم پایگاه داده (`SELECT ... FOR UPDATE`) در مسیر بحرانی رزرو موقت اکیداً ممنوع است.  
-   - ثبت قطعی نوبت در PostgreSQL باید به صورت Optimistic Locking با بررسی ستون `version` انجام گیرد.  
-  
-2. **عدم کوئری مستقیم میان ماژول‌ها (Zero Cross-Module DB Queries):**  
-   - هیچ ماژولی حق دسترسی مستقیم یا Join زدن به جداول دیتابیس کانتکست دیگر را ندارد.  
-   - ماژول `Booking` نباید مستقیماً به دیتابیس `DoctorSchedule` کوئری بزند؛ تعاملات یا باید از طریق Service Interface درون‌برنامه‌ای (In-Memory Module Contract) باشد یا با استفاده از رویداد.  
-  
-3. **ارتباطات رویدادمحور (Event-Driven Integration):**  
-   - ماژول `Notification` هیچ رابط ورودی همگام (RPC/REST) برای ثبت رزرو ارائه نمی‌دهد. ارسال نوتیفیکیشن منحصراً با گوش دادن به رویداد `AppointmentConfirmedEvent` یا `AppointmentCancelledEvent` انجام می‌شود.  
-  
-4. **تطابق با مستندات زنده (Docs-as-Code Compliance):**  
-   - هرگونه تغییر در پروتکل‌های ارتباطی یا الگوهای ذخیره‌سازی نیازمند ثبت سند ADR جدید در دایرکتوری تصمیمات است.  
-  
-## نقشه و پیوندهای مستندات تکمیلی (Docs Index)  
-  
-- [تصمیم معماری استایل پایه (ADR-0001)](ADR0001-modular-monolith-architecture.md): دلایل انتخاب Modular Monolith به جای Microservices در فاز نخست.  
-- [تصمیم مدیریت همزمانی رزرو (ADR-0002)](docs/architecture/decisions/0002-booking-concurrency-lock.md): جزئیات پیاده‌سازی Redis Temporary Hold و مقایسه Trade-offها.  
-- [دیاگرام کانتکست سیستم (C4 Level 1)](docs/architecture/c4/01-context.md): تعاملات بازیگران خارجی (بیمار، پزشک، درگاه پرداخت و پنل پیامک).  
-- [دیاگرام کانتینر سیستم (C4 Level 2)](02-container.md): ساختار مرزهای اجرایی، دیتابیس اصلی و لایه Redis.  
-- [قراردادهای API نوبت‌دهی (OpenAPI)](docs/api/openapi.yaml): ساختار ورودی و خروجی اندپوینت‌های رزرو، لغو و تقویم پزشکان.
+## Bounded Contextهای فعلی
+
+- `Patient`: ثبت‌نام و پروفایل بیمار، اطلاعات تماس و lookup بیمار
+- `Doctor`: پزشک، تخصص، schedule، schedule exception و slotهای عرضه‌شده
+- `Appointment`: رزرو، لغو، جابه‌جایی، lifecycle نوبت و visit status
+- `Notification`: اعلان‌ها و reminderها به‌صورت downstream event consumer
+
+## قوانین معماری و دامنه که باید رعایت شوند
+
+1. **جلوگیری از Double Booking**
+   - برای هر `Slot` حداکثر یک `Appointment` فعال مجاز است.
+   - منبع حقیقت نهایی برای این invariant پایگاه داده تراکنشی و transaction محلی است.
+   - در تعارض همزمانی، فقط یک درخواست موفق می‌شود و بقیه با `APPOINTMENT_SLOT_UNAVAILABLE` رد می‌شوند.
+   - مرجع تصمیم: `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md`
+
+2. **مرز ماژول‌ها**
+   - هیچ ماژولی نباید مستقیماً به entity یا repository داخلی ماژول دیگر دسترسی داشته باشد.
+   - تعامل میان contextها فقط از طریق contract داخلی، query contract یا event داخلی مجاز است.
+   - `Appointment` مالک `Slot` نیست و فقط از contractهای `Doctor` و `Patient` استفاده می‌کند.
+
+3. **مدل وضعیت‌ها**
+   - `Appointment Status` و `Visit Status` دو مفهوم جدا هستند.
+   - `Appointment Status` در MVP: `BOOKED`, `CANCELLED`, `COMPLETED`, `NO_SHOW`
+   - `Visit Status`: `NOT_STARTED`, `WAITING`, `IN_PROGRESS`, `COMPLETED`, `NO_SHOW`
+   - `Slot Status`: `AVAILABLE`, `RESERVED`, `INACTIVE`, `EXPIRED`
+   - مرجع: `docs/architecture/domain/state-machines.md`
+
+4. **قواعد کسب‌وکاری حیاتی**
+   - `Cancellation Window = 2 hours` بر اساس timezone رسمی کلینیک
+   - بیمار فقط تا قبل از پایان این بازه می‌تواند لغو یا جابه‌جایی انجام دهد
+   - `Receptionist` و `Clinic Admin` می‌توانند خارج از این بازه override انجام دهند
+   - بیمار می‌تواند چند نوبت فعال داشته باشد، اما نه بیش از یک نوبت فعال با یک پزشک در یک روز تقویمی
+
+5. **کنترل دسترسی**
+   - `Patient` فقط به داده‌ها و نوبت‌های خودش دسترسی دارد
+   - `Doctor` فقط به schedule، slotها و appointmentهای خودش دسترسی دارد
+   - `Receptionist` actor عملیاتی کلینیک است
+   - `Clinic Admin` actor مدیریتی کسب‌وکاری کلینیک است
+   - `System Admin` actor فنی/امنیتی است و actor روزمره booking محسوب نمی‌شود
+   - مرجع: `docs/architecture/domain/access-control-matrix.md`
+
+## نکات اجرایی برای تولید سورس
+
+- از فرض کردن `Payment Gateway`, `Multi-Clinic`, `Push Notification`, یا `Identity Context` مستقل در MVP خودداری شود مگر اینکه سند جدید اضافه شود.
+- اگر لازم است تصمیم معماری جدیدی گرفته شود، باید ADR جدید ایجاد شود.
+- اگر بین اسناد تعارض وجود داشت، ترتیب مرجع از `docs/akb-baseline.md` پیروی می‌کند.
+- اگر قراردادی هنوز دقیق نشده باشد، باید از اسناد authoritative نقل شود و از اختراع API یا schema قطعی خودداری شود.
+
+## مستندات مرجع مهم
+
+- `docs/akb-baseline.md`
+- `docs/requirements/srs/srs.md`
+- `docs/requirements/functional-requirements.md`
+- `docs/requirements/non-functional-requirements.md`
+- `docs/architecture/decisions/ADR0001-modular-monolith-architecture.md`
+- `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md`
+- `docs/architecture/domain/context-map.md`
+- `docs/architecture/domain/domain-context.md`
+- `docs/architecture/domain/state-machines.md`
+- `docs/architecture/domain/access-control-matrix.md`
+- `docs/architecture/c4models/01-system-context.md`
+- `docs/architecture/c4models/02-container.md`
