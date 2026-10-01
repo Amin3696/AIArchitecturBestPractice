@@ -85,6 +85,7 @@
 | `docs/requirements/users-stakeholders.md` | 0.1 | Working Draft | Supporting | بازیگران و ذی‌نفعان |
 | `docs/api/rest-api-standards.md` | 1.0 | Draft Standard | Authoritative | استاندارد طراحی REST API |
 | `docs/architecture/decisions/ADR0001-modular-monolith-architecture.md` | 1.0 | Proposed | Authoritative in Scope | تصمیم معماری ثبت‌شده برای سبک سیستم |
+| `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md` | 1.0 | Accepted | Authoritative in Scope | تصمیم معماری برای جلوگیری از double booking و atomicity رزرو |
 | `docs/architecture/c4models/01-system-context.md` | 0.1 | Working Draft | Supporting | نمای سطح بالا از بازیگران و سیستم |
 | `docs/architecture/c4models/02-container.md` | 0.1 | Working Draft | Supporting | نمای کانتینرها و اجزای اجرایی |
 | `docs/architecture/domain/context-map.md` | 0.5 | Working Draft | Supporting | نقشه فعلی bounded contextها و روابط آن‌ها |
