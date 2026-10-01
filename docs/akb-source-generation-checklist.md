@@ -20,12 +20,12 @@
 
 ### 2) تکمیل مدل دامنه و مرزها
 
-- [ ] `context-map` تکمیل شود.
-- [ ] `domain-context` تکمیل شود.
-- [ ] `ubiquitous-language` تکمیل شود.
-- [ ] مشخصات همه bounded contextها تکمیل شود: `appointment`, `doctor`, `patient`, `notification`.
-- [ ] مسئولیت هر context و owner هر business capability نهایی شود.
-- [ ] نوع ارتباط بین contextها مشخص شود: upstream/downstream, ACL, shared kernel, published language.
+- [x] `context-map` تکمیل شود.
+- [x] `domain-context` تکمیل شود.
+- [x] `ubiquitous-language` تکمیل شود.
+- [x] مشخصات همه bounded contextها تکمیل شود: `appointment`, `doctor`, `patient`, `notification`.
+- [x] مسئولیت هر context و owner هر business capability نهایی شود.
+- [x] نوع ارتباط بین contextها مشخص شود: upstream/downstream, ACL, shared kernel, published language.
 
 ### 3) نهایی‌سازی business rules حیاتی
 

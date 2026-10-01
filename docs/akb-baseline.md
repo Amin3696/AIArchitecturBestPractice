@@ -87,13 +87,13 @@
 | `docs/architecture/decisions/ADR0001-modular-monolith-architecture.md` | 1.0 | Proposed | Authoritative in Scope | تصمیم معماری ثبت‌شده برای سبک سیستم |
 | `docs/architecture/c4models/01-system-context.md` | 0.1 | Working Draft | Supporting | نمای سطح بالا از بازیگران و سیستم |
 | `docs/architecture/c4models/02-container.md` | 0.1 | Working Draft | Supporting | نمای کانتینرها و اجزای اجرایی |
-| `docs/architecture/domain/context-map.md` | 0.1 | Empty Draft | Not Yet Authoritative | نیازمند تکمیل |
-| `docs/architecture/domain/domain-context.md` | 0.1 | Working Draft | Not Yet Authoritative | نیازمند تفکیک دقیق دامنه |
-| `docs/architecture/domain/ubiquitous-language.md` | 0.1 | Empty Draft | Not Yet Authoritative | نیازمند تکمیل |
-| `docs/architecture/domain/contexts/appointment/context-spec.md` | 0.1 | Empty Draft | Not Yet Authoritative | نیازمند تکمیل |
-| `docs/architecture/domain/contexts/doctor/context-spec.md` | 0.1 | Empty Draft | Not Yet Authoritative | نیازمند تکمیل |
-| `docs/architecture/domain/contexts/patient/context-spec.md` | 0.1 | Empty Draft | Not Yet Authoritative | نیازمند تکمیل |
-| `docs/architecture/domain/contexts/notification/context-spec.md` | 0.1 | Empty Draft | Not Yet Authoritative | نیازمند تکمیل |
+| `docs/architecture/domain/context-map.md` | 0.5 | Working Draft | Supporting | نقشه فعلی bounded contextها و روابط آن‌ها |
+| `docs/architecture/domain/domain-context.md` | 0.5 | Working Draft | Supporting | دامنه، capabilityها و مرز مسئولیت‌ها |
+| `docs/architecture/domain/ubiquitous-language.md` | 0.5 | Working Draft | Supporting | واژگان مشترک پروژه |
+| `docs/architecture/domain/contexts/appointment/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context رزرو و lifecycle نوبت |
+| `docs/architecture/domain/contexts/doctor/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context پزشک، schedule و slot |
+| `docs/architecture/domain/contexts/patient/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context بیمار و پروفایل |
+| `docs/architecture/domain/contexts/notification/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context اعلان و reminder |
 
 ---
 
