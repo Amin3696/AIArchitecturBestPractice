@@ -67,12 +67,12 @@
 
 ### 8) use caseهای end-to-end
 
-- [ ] use case رزرو نوبت مستند شود.
-- [ ] use case لغو نوبت مستند شود.
-- [ ] use case جابه‌جایی نوبت مستند شود.
-- [ ] use case مدیریت برنامه پزشک مستند شود.
-- [ ] use case notification و reminder مستند شود.
-- [ ] exception flowهای حیاتی برای concurrency و authorization مستند شوند.
+- [x] use case رزرو نوبت مستند شود.
+- [x] use case لغو نوبت مستند شود.
+- [x] use case جابه‌جایی نوبت مستند شود.
+- [x] use case مدیریت برنامه پزشک مستند شود.
+- [x] use case notification و reminder مستند شود.
+- [x] exception flowهای حیاتی برای concurrency و authorization مستند شوند.
 
 ---
 
