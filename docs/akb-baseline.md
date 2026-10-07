@@ -75,28 +75,28 @@
 
 ## 4. Key Document Registry
 
-| سند | نسخه | وضعیت | نوع مرجع | توضیح |
-| --- | --- | --- | --- | --- |
-| `docs/README.md` | 1.0 | Reviewed | Authoritative | ساختار و سیاست نگه‌داری مستندات |
-| `docs/akb-baseline.md` | 1.0 | Reviewed Baseline | Authoritative | baseline فعلی AKB و مرجع رفع تعارض |
-| `docs/requirements/srs/srs.md` | 1.0 | Draft | Authoritative | نیازمندی‌های رسمی سیستم |
-| `docs/requirements/functional-requirements.md` | 0.1 | Working Draft | Supporting | FRهای کاری و ابهام‌ها |
-| `docs/requirements/non-functional-requirements.md` | 0.1 | Working Draft | Supporting | NFRهای کاری و معیارهای اولیه |
-| `docs/requirements/users-stakeholders.md` | 0.1 | Working Draft | Supporting | بازیگران و ذی‌نفعان |
-| `docs/api/rest-api-standards.md` | 1.0 | Draft Standard | Authoritative | استاندارد طراحی REST API |
-| `docs/architecture/decisions/ADR0001-modular-monolith-architecture.md` | 1.0 | Proposed | Authoritative in Scope | تصمیم معماری ثبت‌شده برای سبک سیستم |
-| `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md` | 1.0 | Accepted | Authoritative in Scope | تصمیم معماری برای جلوگیری از double booking و atomicity رزرو |
-| `docs/architecture/c4models/01-system-context.md` | 0.1 | Working Draft | Supporting | نمای سطح بالا از بازیگران و سیستم |
-| `docs/architecture/c4models/02-container.md` | 0.1 | Working Draft | Supporting | نمای کانتینرها و اجزای اجرایی |
-| `docs/architecture/domain/context-map.md` | 0.5 | Working Draft | Supporting | نقشه فعلی bounded contextها و روابط آن‌ها |
-| `docs/architecture/domain/domain-context.md` | 0.5 | Working Draft | Supporting | دامنه، capabilityها و مرز مسئولیت‌ها |
-| `docs/architecture/domain/access-control-matrix.md` | 0.5 | Working Draft | Supporting | ماتریس نقش/مجوز و overrideهای مجاز |
-| `docs/architecture/domain/state-machines.md` | 0.5 | Working Draft | Supporting | مدل وضعیت‌های Appointment، Visit و Slot |
-| `docs/architecture/domain/ubiquitous-language.md` | 0.5 | Working Draft | Supporting | واژگان مشترک پروژه |
-| `docs/architecture/domain/contexts/appointment/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context رزرو و lifecycle نوبت |
-| `docs/architecture/domain/contexts/doctor/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context پزشک، schedule و slot |
-| `docs/architecture/domain/contexts/patient/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context بیمار و پروفایل |
-| `docs/architecture/domain/contexts/notification/context-spec.md` | 0.5 | Working Draft | Supporting | مشخصات context اعلان و reminder |
+| سند                                                                                  | نسخه | وضعیت             | نوع مرجع               | توضیح                                                        |
+| ------------------------------------------------------------------------------------ | ---- | ----------------- | ---------------------- | ------------------------------------------------------------ |
+| `docs/README.md`                                                                     | 1.0  | Reviewed          | Authoritative          | ساختار و سیاست نگه‌داری مستندات                              |
+| `docs/akb-baseline.md`                                                               | 1.0  | Reviewed Baseline | Authoritative          | baseline فعلی AKB و مرجع رفع تعارض                           |
+| `docs/requirements/srs/srs.md`                                                       | 1.0  | Draft             | Authoritative          | نیازمندی‌های رسمی سیستم                                      |
+| `docs/requirements/functional-requirements.md`                                       | 0.1  | Working Draft     | Supporting             | FRهای کاری و ابهام‌ها                                        |
+| `docs/requirements/non-functional-requirements.md`                                   | 0.1  | Working Draft     | Supporting             | NFRهای کاری و معیارهای اولیه                                 |
+| `docs/requirements/users-stakeholders.md`                                            | 0.1  | Working Draft     | Supporting             | بازیگران و ذی‌نفعان                                          |
+| `docs/api/rest-api-standards.md`                                                     | 1.0  | Draft Standard    | Authoritative          | استاندارد طراحی REST API                                     |
+| `docs/architecture/decisions/ADR0001-modular-monolith-architecture.md`               | 1.0  | Proposed          | Authoritative in Scope | تصمیم معماری ثبت‌شده برای سبک سیستم                          |
+| `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md` | 1.0  | Accepted          | Authoritative in Scope | تصمیم معماری برای جلوگیری از double booking و atomicity رزرو |
+| `docs/architecture/c4models/01-system-context.md`                                    | 0.1  | Working Draft     | Supporting             | نمای سطح بالا از بازیگران و سیستم                            |
+| `docs/architecture/c4models/02-container.md`                                         | 0.1  | Working Draft     | Supporting             | نمای کانتینرها و اجزای اجرایی                                |
+| `docs/architecture/domain/context-map.md`                                            | 0.5  | Working Draft     | Supporting             | نقشه فعلی bounded contextها و روابط آن‌ها                    |
+| `docs/architecture/domain/domain-context.md`                                         | 0.5  | Working Draft     | Supporting             | دامنه، capabilityها و مرز مسئولیت‌ها                         |
+| `docs/architecture/domain/access-control-matrix.md`                                  | 0.5  | Working Draft     | Supporting             | ماتریس نقش/مجوز و overrideهای مجاز                           |
+| `docs/architecture/domain/state-machines.md`                                         | 0.5  | Working Draft     | Supporting             | مدل وضعیت‌های Appointment، Visit و Slot                      |
+| `docs/architecture/domain/ubiquitous-language.md`                                    | 0.5  | Working Draft     | Supporting             | واژگان مشترک پروژه                                           |
+| `docs/architecture/domain/contexts/appointment/context-spec.md`                      | 0.5  | Working Draft     | Supporting             | مشخصات context رزرو و lifecycle نوبت                         |
+| `docs/architecture/domain/contexts/doctor/context-spec.md`                           | 0.5  | Working Draft     | Supporting             | مشخصات context پزشک، schedule و slot                         |
+| `docs/architecture/domain/contexts/patient/context-spec.md`                          | 0.5  | Working Draft     | Supporting             | مشخصات context بیمار و پروفایل                               |
+| `docs/architecture/domain/contexts/notification/context-spec.md`                     | 0.5  | Working Draft     | Supporting             | مشخصات context اعلان و reminder                              |
 
 ---
 

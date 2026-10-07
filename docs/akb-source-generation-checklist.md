@@ -51,11 +51,11 @@
 
 ### 6) API contractهای واقعی
 
-- [ ] فهرست endpointهای MVP تعریف شود.
-- [ ] request/response schema برای هر endpoint مشخص شود.
-- [ ] status code و business error code هر سناریوی اصلی تعریف شود.
-- [ ] قرارداد احراز هویت، logout، reset password و session/token مشخص شود.
-- [ ] قواعد idempotency برای عملیات حساس مثل booking/reschedule مشخص شود.
+- [x] فهرست endpointهای MVP تعریف شود.
+- [x] request/response schema برای هر endpoint مشخص شود.
+- [x] status code و business error code هر سناریوی اصلی تعریف شود.
+- [x] قرارداد احراز هویت، logout، reset password و session/token مشخص شود.
+- [x] قواعد idempotency برای عملیات حساس مثل booking/reschedule مشخص شود.
 
 ### 7) مدل داده و قیود پایگاه داده
 
