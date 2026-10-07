@@ -59,11 +59,11 @@
 
 ### 7) مدل داده و قیود پایگاه داده
 
-- [ ] ERD منطقی سیستم تهیه شود.
-- [ ] aggregateها، entityها و value objectها نهایی شوند.
-- [ ] جدول‌ها، کلیدها، unique constraintها و foreign keyها تعریف شوند.
-- [ ] strategy جلوگیری از رزرو همزمان در سطح persistence مشخص شود.
-- [ ] timezone رسمی سیستم و نحوه ذخیره زمان‌ها مشخص شود.
+- [x] ERD منطقی سیستم تهیه شود.
+- [x] aggregateها، entityها و value objectها نهایی شوند.
+- [x] جدول‌ها، کلیدها، unique constraintها و foreign keyها تعریف شوند.
+- [x] strategy جلوگیری از رزرو همزمان در سطح persistence مشخص شود.
+- [x] timezone رسمی سیستم و نحوه ذخیره زمان‌ها مشخص شود.
 
 ### 8) use caseهای end-to-end
 
