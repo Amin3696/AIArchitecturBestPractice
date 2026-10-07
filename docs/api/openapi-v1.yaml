@@ -1,0 +1,1342 @@
+openapi: 3.0.3
+info:
+  title: Clinic Appointment System API
+  version: 1.0.0
+  description: |
+    Executable OpenAPI contract for MVP.
+    Source of truth: docs/api/mvp-api-contract.md
+servers:
+  - url: /api/v1
+tags:
+  - name: Auth
+  - name: Patient
+  - name: Doctor
+  - name: Specialty
+  - name: Schedule
+  - name: Slot
+  - name: Appointment
+  - name: Notification
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseEnvelope'
+        '401':
+          $ref: '#/components/responses/AuthInvalidCredentials'
+        '423':
+          $ref: '#/components/responses/AuthAccountLocked'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Refreshed tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseEnvelope'
+        '401':
+          $ref: '#/components/responses/AuthInvalidRefreshToken'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '204':
+          description: Logged out
+        '401':
+          $ref: '#/components/responses/AuthUnauthenticated'
+
+  /auth/password-reset-requests:
+    post:
+      tags: [Auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestCreate'
+      responses:
+        '202':
+          description: Accepted (generic response)
+
+  /auth/password-resets:
+    post:
+      tags: [Auth]
+      summary: Confirm password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+      responses:
+        '204':
+          description: Password reset completed
+        '400':
+          $ref: '#/components/responses/AuthResetTokenInvalid'
+        '410':
+          $ref: '#/components/responses/AuthResetTokenExpired'
+
+  /patients:
+    post:
+      tags: [Patient]
+      summary: Register patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRegisterRequest'
+      responses:
+        '201':
+          description: Patient created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponseEnvelope'
+        '409':
+          $ref: '#/components/responses/PatientMobileAlreadyExists'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /patients/me:
+    get:
+      tags: [Patient]
+      summary: Get current patient profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponseEnvelope'
+        '401':
+          $ref: '#/components/responses/AuthUnauthenticated'
+    patch:
+      tags: [Patient]
+      summary: Update current patient profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientUpdateRequest'
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponseEnvelope'
+        '401':
+          $ref: '#/components/responses/AuthUnauthenticated'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /doctors:
+    post:
+      tags: [Doctor]
+      summary: Create doctor
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorCreateRequest'
+      responses:
+        '201':
+          description: Doctor created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorResponseEnvelope'
+        '401':
+          $ref: '#/components/responses/AuthUnauthenticated'
+        '403':
+          $ref: '#/components/responses/AuthForbidden'
+    get:
+      tags: [Doctor]
+      summary: Search doctors
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: specialtyId
+          schema: { type: string }
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: date
+          schema: { type: string, format: date }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Doctor list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorCollectionEnvelope'
+
+  /doctors/{doctorId}:
+    patch:
+      tags: [Doctor]
+      summary: Update doctor
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DoctorId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorUpdateRequest'
+      responses:
+        '200':
+          description: Updated doctor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorResponseEnvelope'
+        '404':
+          $ref: '#/components/responses/DoctorNotFound'
+
+  /doctors/{doctorId}/deactivation:
+    post:
+      tags: [Doctor]
+      summary: Deactivate doctor
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DoctorId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      responses:
+        '204':
+          description: Deactivated
+        '404':
+          $ref: '#/components/responses/DoctorNotFound'
+
+  /specialties:
+    post:
+      tags: [Specialty]
+      summary: Create specialty
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialtyUpsertRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialtyResponseEnvelope'
+    get:
+      tags: [Specialty]
+      summary: Get specialties
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Specialty list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialtyCollectionEnvelope'
+
+  /specialties/{specialtyId}:
+    patch:
+      tags: [Specialty]
+      summary: Update specialty
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SpecialtyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialtyUpsertRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialtyResponseEnvelope'
+
+  /specialties/{specialtyId}/deactivation:
+    post:
+      tags: [Specialty]
+      summary: Deactivate specialty
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SpecialtyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      responses:
+        '204':
+          description: Deactivated
+
+  /doctors/{doctorId}/schedules:
+    post:
+      tags: [Schedule]
+      summary: Define doctor schedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DoctorId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCreateRequest'
+      responses:
+        '201':
+          description: Schedule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponseEnvelope'
+
+  /doctors/{doctorId}/schedules/{scheduleId}/exceptions:
+    post:
+      tags: [Schedule]
+      summary: Add schedule exception
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DoctorId'
+        - $ref: '#/components/parameters/ScheduleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleExceptionCreateRequest'
+      responses:
+        '201':
+          description: Exception created
+
+  /doctors/{doctorId}/slots:generate:
+    post:
+      tags: [Slot]
+      summary: Generate doctor slots (async)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DoctorId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateSlotsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateSlotsResponseEnvelope'
+
+  /slots:
+    post:
+      tags: [Slot]
+      summary: Create manual slot
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlotCreateRequest'
+      responses:
+        '201':
+          description: Slot created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlotResponseEnvelope'
+        '409':
+          $ref: '#/components/responses/SlotOverlap'
+
+  /slots/{slotId}/deactivation:
+    post:
+      tags: [Slot]
+      summary: Deactivate slot
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SlotId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      responses:
+        '204':
+          description: Deactivated
+
+  /doctors/{doctorId}/available-slots:
+    get:
+      tags: [Slot]
+      summary: Get available slots for doctor on date
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DoctorId'
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Available slots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlotCollectionEnvelope'
+
+  /appointments:
+    post:
+      tags: [Appointment]
+      summary: Book appointment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment booked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponseEnvelope'
+        '400':
+          $ref: '#/components/responses/IdempotencyKeyRequired'
+        '404':
+          $ref: '#/components/responses/SlotNotFound'
+        '409':
+          $ref: '#/components/responses/AppointmentSlotUnavailable'
+
+  /appointments/me:
+    get:
+      tags: [Appointment]
+      summary: Get current patient appointments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [BOOKED, CANCELLED, COMPLETED, NO_SHOW]
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Appointment list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentCollectionEnvelope'
+
+  /appointments/{appointmentId}:
+    get:
+      tags: [Appointment]
+      summary: Get appointment details
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AppointmentId'
+      responses:
+        '200':
+          description: Appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponseEnvelope'
+        '403':
+          $ref: '#/components/responses/AuthForbidden'
+        '404':
+          $ref: '#/components/responses/AppointmentNotFound'
+
+  /appointments/{appointmentId}/cancellation:
+    post:
+      tags: [Appointment]
+      summary: Cancel appointment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AppointmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentCancellationEnvelope'
+        '409':
+          $ref: '#/components/responses/AppointmentCancellationWindowExceeded'
+
+  /appointments/{appointmentId}/reschedule:
+    post:
+      tags: [Appointment]
+      summary: Reschedule appointment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AppointmentId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleRequest'
+      responses:
+        '200':
+          description: Rescheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentRescheduleEnvelope'
+        '400':
+          $ref: '#/components/responses/IdempotencyKeyRequired'
+        '409':
+          $ref: '#/components/responses/AppointmentSlotUnavailable'
+
+  /appointments/{appointmentId}/visit-status:
+    post:
+      tags: [Appointment]
+      summary: Update visit status
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AppointmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitStatusUpdateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitStatusEnvelope'
+        '403':
+          $ref: '#/components/responses/AuthForbidden'
+        '409':
+          $ref: '#/components/responses/AppointmentInvalidStateTransition'
+
+  /appointments/clinic:
+    get:
+      tags: [Appointment]
+      summary: Get clinic appointments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: doctorId
+          schema:
+            type: string
+        - in: query
+          name: specialtyId
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [BOOKED, CANCELLED, COMPLETED, NO_SHOW]
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Clinic appointment list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentCollectionEnvelope'
+
+  /notifications/me:
+    get:
+      tags: [Notification]
+      summary: Get current patient notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCollectionEnvelope'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    DoctorId:
+      in: path
+      name: doctorId
+      required: true
+      schema: { type: string }
+    SpecialtyId:
+      in: path
+      name: specialtyId
+      required: true
+      schema: { type: string }
+    SlotId:
+      in: path
+      name: slotId
+      required: true
+      schema: { type: string }
+    AppointmentId:
+      in: path
+      name: appointmentId
+      required: true
+      schema: { type: string }
+    ScheduleId:
+      in: path
+      name: scheduleId
+      required: true
+      schema: { type: string }
+    Page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      in: query
+      name: pageSize
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    IdempotencyKey:
+      in: header
+      name: X-Idempotency-Key
+      required: true
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+
+  responses:
+    AuthUnauthenticated:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: AUTH_UNAUTHENTICATED
+                  message: Authentication is required.
+                  requestId: 9fd79f8f-1385-4bf2-9f57-16ff2e66cdb1
+    AuthInvalidCredentials:
+      description: Invalid credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: AUTH_INVALID_CREDENTIALS
+                  message: Mobile number or password is invalid.
+    AuthInvalidRefreshToken:
+      description: Invalid refresh token or revoked session
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            invalid:
+              value:
+                error:
+                  code: AUTH_INVALID_REFRESH_TOKEN
+                  message: Refresh token is invalid.
+            revoked:
+              value:
+                error:
+                  code: AUTH_SESSION_REVOKED
+                  message: Session has been revoked.
+    AuthAccountLocked:
+      description: Account locked
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: AUTH_ACCOUNT_LOCKED
+                  message: Account is locked.
+    AuthResetTokenInvalid:
+      description: Invalid reset token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: AUTH_RESET_TOKEN_INVALID
+                  message: Reset token is invalid.
+    AuthResetTokenExpired:
+      description: Expired reset token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: AUTH_RESET_TOKEN_EXPIRED
+                  message: Reset token has expired.
+    AuthForbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: AUTH_FORBIDDEN
+                  message: You do not have permission for this operation.
+    ValidationFailed:
+      description: Validation failed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+    PatientMobileAlreadyExists:
+      description: Mobile number already exists
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: PATIENT_MOBILE_ALREADY_EXISTS
+                  message: Mobile number is already registered.
+    DoctorNotFound:
+      description: Doctor not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: DOCTOR_NOT_FOUND
+                  message: Doctor not found.
+    SlotOverlap:
+      description: Slot overlap conflict
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: SLOT_OVERLAP
+                  message: Slot overlaps with an existing slot.
+    SlotNotFound:
+      description: Slot not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: SLOT_NOT_FOUND
+                  message: Slot not found.
+    AppointmentNotFound:
+      description: Appointment not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: APPOINTMENT_NOT_FOUND
+                  message: Appointment not found.
+    AppointmentSlotUnavailable:
+      description: Slot unavailable or appointment conflict
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            slotUnavailable:
+              value:
+                error:
+                  code: APPOINTMENT_SLOT_UNAVAILABLE
+                  message: The requested slot is no longer available.
+            patientDoctorDayConflict:
+              value:
+                error:
+                  code: APPOINTMENT_PATIENT_DOCTOR_DAY_CONFLICT
+                  message: Patient already has an active appointment with this doctor on this day.
+            doctorInactive:
+              value:
+                error:
+                  code: DOCTOR_INACTIVE
+                  message: Doctor is inactive.
+            slotInactive:
+              value:
+                error:
+                  code: SLOT_INACTIVE
+                  message: Slot is inactive.
+            slotInPast:
+              value:
+                error:
+                  code: SLOT_IN_PAST
+                  message: Slot is in the past.
+    AppointmentCancellationWindowExceeded:
+      description: Cancellation/reschedule out of allowed window
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            exceeded:
+              value:
+                error:
+                  code: APPOINTMENT_CANCELLATION_WINDOW_EXCEEDED
+                  message: Cancellation window exceeded.
+            terminal:
+              value:
+                error:
+                  code: APPOINTMENT_ALREADY_TERMINAL
+                  message: Appointment is already in terminal status.
+    AppointmentInvalidStateTransition:
+      description: Invalid visit/appointment transition
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            default:
+              value:
+                error:
+                  code: APPOINTMENT_INVALID_STATE_TRANSITION
+                  message: Transition is not allowed.
+    IdempotencyKeyRequired:
+      description: Idempotency key required or invalid
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorEnvelope' }
+          examples:
+            required:
+              value:
+                error:
+                  code: IDEMPOTENCY_KEY_REQUIRED
+                  message: X-Idempotency-Key header is required.
+            invalid:
+              value:
+                error:
+                  code: IDEMPOTENCY_KEY_INVALID
+                  message: Idempotency key is invalid.
+            reused:
+              value:
+                error:
+                  code: IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD
+                  message: Same idempotency key cannot be reused with a different payload.
+
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorModel'
+    ErrorModel:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              reason: { type: string }
+        requestId:
+          type: string
+          format: uuid
+
+    Pagination:
+      type: object
+      properties:
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalItems: { type: integer }
+        totalPages: { type: integer }
+        hasNext: { type: boolean }
+        hasPrevious: { type: boolean }
+
+    LoginRequest:
+      type: object
+      required: [mobileNumber, password]
+      properties:
+        mobileNumber: { type: string }
+        password: { type: string, format: password }
+    RefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken: { type: string }
+    LogoutRequest:
+      type: object
+      required: [sessionId]
+      properties:
+        sessionId: { type: string }
+    PasswordResetRequestCreate:
+      type: object
+      required: [mobileNumber]
+      properties:
+        mobileNumber: { type: string }
+    PasswordResetConfirmRequest:
+      type: object
+      required: [mobileNumber, resetToken, newPassword]
+      properties:
+        mobileNumber: { type: string }
+        resetToken: { type: string }
+        newPassword: { type: string, format: password }
+    TokenPayload:
+      type: object
+      required: [accessToken, refreshToken, tokenType, expiresIn, refreshExpiresIn, sessionId, user]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        tokenType: { type: string, example: Bearer }
+        expiresIn: { type: integer, example: 900 }
+        refreshExpiresIn: { type: integer, example: 2592000 }
+        sessionId: { type: string }
+        user:
+          type: object
+          required: [userId, role, displayName]
+          properties:
+            userId: { type: string }
+            role:
+              type: string
+              enum: [PATIENT, DOCTOR, RECEPTIONIST, CLINIC_ADMIN, SYSTEM_ADMIN]
+            displayName: { type: string }
+    LoginResponseEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/TokenPayload'
+
+    Patient:
+      type: object
+      required: [patientId, firstName, lastName, mobileNumber, status]
+      properties:
+        patientId: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        mobileNumber: { type: string }
+        dateOfBirth: { type: string, format: date }
+        email: { type: string, format: email }
+        status: { type: string, enum: [ACTIVE, INACTIVE] }
+        createdAt: { type: string, format: date-time }
+    PatientRegisterRequest:
+      type: object
+      required: [firstName, lastName, mobileNumber, dateOfBirth, password]
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        mobileNumber: { type: string }
+        dateOfBirth: { type: string, format: date }
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+    PatientUpdateRequest:
+      type: object
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+    PatientResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Patient'
+
+    Specialty:
+      type: object
+      required: [specialtyId, code, title, isActive]
+      properties:
+        specialtyId: { type: string }
+        code: { type: string }
+        title: { type: string }
+        isActive: { type: boolean }
+    SpecialtyUpsertRequest:
+      type: object
+      required: [code, title, isActive]
+      properties:
+        code: { type: string }
+        title: { type: string }
+        isActive: { type: boolean }
+    SpecialtyResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Specialty'
+    SpecialtyCollectionEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specialty'
+
+    Doctor:
+      type: object
+      required: [doctorId, fullName, status]
+      properties:
+        doctorId: { type: string }
+        fullName: { type: string }
+        status: { type: string, enum: [ACTIVE, INACTIVE] }
+        defaultVisitDurationMinutes: { type: integer }
+        specialties:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - type: object
+                properties:
+                  specialtyId: { type: string }
+                  title: { type: string }
+    DoctorCreateRequest:
+      type: object
+      required: [fullName, defaultVisitDurationMinutes, specialtyIds, status]
+      properties:
+        fullName: { type: string }
+        defaultVisitDurationMinutes: { type: integer, minimum: 5 }
+        specialtyIds:
+          type: array
+          items: { type: string }
+        status: { type: string, enum: [ACTIVE, INACTIVE] }
+    DoctorUpdateRequest:
+      type: object
+      properties:
+        fullName: { type: string }
+        defaultVisitDurationMinutes: { type: integer, minimum: 5 }
+    DoctorResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Doctor'
+    DoctorCollectionEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doctor'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    WorkingWindow:
+      type: object
+      required: [dayOfWeek, start, end]
+      properties:
+        dayOfWeek: { type: integer, minimum: 1, maximum: 7 }
+        start: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        end: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+    ScheduleCreateRequest:
+      type: object
+      required: [effectiveFrom, effectiveTo, recurrencePattern, workingWindows]
+      properties:
+        effectiveFrom: { type: string, format: date }
+        effectiveTo: { type: string, format: date }
+        recurrencePattern: { type: string, enum: [WEEKLY] }
+        workingWindows:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkingWindow'
+    Schedule:
+      type: object
+      properties:
+        scheduleId: { type: string }
+        doctorId: { type: string }
+        isActive: { type: boolean }
+    ScheduleResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Schedule'
+    ScheduleExceptionCreateRequest:
+      type: object
+      required: [exceptionDate, type]
+      properties:
+        exceptionDate: { type: string, format: date }
+        type: { type: string, enum: [DAY_OFF, CUSTOM_WINDOW] }
+        reason: { type: string }
+
+    Slot:
+      type: object
+      properties:
+        slotId: { type: string }
+        doctorId: { type: string }
+        startAt: { type: string, format: date-time }
+        endAt: { type: string, format: date-time }
+        status: { type: string, enum: [AVAILABLE, RESERVED, INACTIVE, EXPIRED] }
+    SlotCreateRequest:
+      type: object
+      required: [doctorId, startAt, endAt]
+      properties:
+        doctorId: { type: string }
+        startAt: { type: string, format: date-time }
+        endAt: { type: string, format: date-time }
+    GenerateSlotsRequest:
+      type: object
+      required: [fromDate, toDate, slotDurationMinutes]
+      properties:
+        fromDate: { type: string, format: date }
+        toDate: { type: string, format: date }
+        slotDurationMinutes: { type: integer, minimum: 5 }
+    GenerateSlotsResponseEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            jobId: { type: string }
+            status: { type: string, example: ACCEPTED }
+    SlotResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Slot'
+    SlotCollectionEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+
+    Appointment:
+      type: object
+      properties:
+        appointmentId: { type: string }
+        patientId: { type: string }
+        doctorId: { type: string }
+        slotId: { type: string }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+        appointmentStatus:
+          type: string
+          enum: [BOOKED, CANCELLED, COMPLETED, NO_SHOW]
+        visitStatus:
+          type: string
+          enum: [NOT_STARTED, WAITING, IN_PROGRESS, COMPLETED, NO_SHOW]
+        bookedAt: { type: string, format: date-time }
+        cancelledAt: { type: string, format: date-time }
+    BookAppointmentRequest:
+      type: object
+      required: [patientId, slotId]
+      properties:
+        patientId: { type: string }
+        slotId: { type: string }
+    RescheduleRequest:
+      type: object
+      required: [newSlotId]
+      properties:
+        newSlotId: { type: string }
+        reason: { type: string }
+    VisitStatusUpdateRequest:
+      type: object
+      required: [visitStatus]
+      properties:
+        visitStatus:
+          type: string
+          enum: [WAITING, IN_PROGRESS, COMPLETED, NO_SHOW]
+    AppointmentResponseEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Appointment'
+    AppointmentCancellationEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            appointmentId: { type: string }
+            appointmentStatus: { type: string, enum: [CANCELLED] }
+            cancelledAt: { type: string, format: date-time }
+    AppointmentRescheduleEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            appointmentId: { type: string }
+            oldSlotId: { type: string }
+            newSlotId: { type: string }
+            appointmentStatus: { type: string, enum: [BOOKED] }
+            visitStatus:
+              type: string
+              enum: [NOT_STARTED]
+            rescheduledAt: { type: string, format: date-time }
+    VisitStatusEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            appointmentId: { type: string }
+            appointmentStatus:
+              type: string
+              enum: [BOOKED, COMPLETED, NO_SHOW]
+            visitStatus:
+              type: string
+              enum: [WAITING, IN_PROGRESS, COMPLETED, NO_SHOW]
+            updatedAt: { type: string, format: date-time }
+    AppointmentCollectionEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Notification:
+      type: object
+      properties:
+        notificationId: { type: string }
+        templateType: { type: string }
+        channel: { type: string, enum: [SMS, EMAIL, PUSH] }
+        status: { type: string, enum: [PENDING, SENT, FAILED] }
+        scheduledAt: { type: string, format: date-time }
+        sentAt: { type: string, format: date-time }
+    NotificationCollectionEnvelope:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ReasonRequest:
+      type: object
+      properties:
+        reason:
+          type: string
