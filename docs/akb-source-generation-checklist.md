@@ -74,6 +74,44 @@
 - [x] use case notification و reminder مستند شود.
 - [x] exception flowهای حیاتی برای concurrency و authorization مستند شوند.
 
+### A) آماده‌سازی ریپو برای شروع کدنویسی (Bootstrap)
+
+- [ ] ساختار اولیه سورس ایجاد شود (`src/` در ریشه ریپو هنوز وجود ندارد).
+- [ ] ابزار build رسمی پروژه نهایی شود (`Maven` یا `Gradle`) و wrapper آن در ریپو ثبت شود.
+- [ ] ساختار ماژولار کد بر اساس `Spring Modulith` تعریف شود (حداقل package/moduleهای `patient`, `doctor`, `appointment`, `notification`, `shared`).
+- [ ] اسکلت فنی حداقلی MVP ثبت شود: `Spring Boot 3.x`, `Java 21`, dependency management, lint/format.
+- [ ] زیرساخت local dev برای `PostgreSQL` و `Redis` (ترجیحاً `docker-compose`) اضافه شود.
+- [ ] strategy مهاجرت دیتابیس (`Flyway` یا `Liquibase`) انتخاب و baseline migration اولیه ایجاد شود.
+- [ ] پروفایل‌های اجرایی (`dev`, `test`) و قرارداد config/env varها مستند و پیاده‌سازی اولیه شوند.
+- [ ] اسکلت تست‌ها (unit/integration) و حداقل سناریوهای رزرو همزمان آماده شود.
+- [ ] pipeline پایه CI (build + test + API contract validation) تعریف شود.
+
+### B) هم‌ترازی اسناد قبل از تولید سورس
+
+- [ ] مرجعیت `docs/akb-baseline.md` با فایل‌های واقعی ADR هم‌تراز شود (نام فایل‌ها و وضعیت‌ها به‌روزرسانی شود).
+- [ ] `C4 Level 3 Backend Components` با استک جدید هم‌راستا شود (حذف ارجاع `Node.js/BullMQ worker` در صورت عدم استفاده در MVP).
+- [ ] نام هدر idempotency در اسناد یکسان شود (`Idempotency-Key` در مقابل `X-Idempotency-Key`).
+
+### C) بستن ابهام‌های تحلیلی قبل از تولید سورس
+
+- [ ] ابهام‌های FR باز که روی طراحی اثر مستقیم دارند بسته شوند (حداقل: `FR-04`, `FR-06`, `FR-14`, `FR-16`, `FR-36`, `FR-40`, `FR-43`, `FR-51`).
+- [ ] تکلیف کانال `Push Notification` برای MVP به‌صورت قطعی مشخص شود (`in-scope` یا `out-of-scope`).
+- [ ] سیاست دقیق Reminder نهایی شود (زمان‌بندی ارسال، تعداد دفعات، cutoff، timezone evaluation).
+- [ ] قواعد دقیق مدیریت Schedule/Slot نهایی شود (منبع تولید Slot، ویرایش مجاز Slot رزروشده، اثر تعطیلی برنامه روی Appointmentهای موجود).
+- [ ] قواعد گزارش‌گیری MVP نهایی شود (KPIها، فیلترها، بازه‌های زمانی و format خروجی).
+
+### D) خط سیر استاندارد تولید کد (Engineering Delivery Flow)
+
+- [ ] `Phase 0 - Governance`: baseline اسناد و ADRها sync و statusها (`draft/reviewed/approved`) تثبیت شوند.
+- [ ] `Phase 1 - Contract First`: `openapi-v1.yaml` lint/validate شود و با `mvp-api-contract.md` و `rest-api-standards.md` هم‌تراز بماند.
+- [ ] `Phase 2 - Schema First`: migrationهای versioned (DDL + constraints + indexes) از مدل داده تولید و روی DB خالی اجرا/rollback تست شوند.
+- [ ] `Phase 3 - Modulith Skeleton`: ماژول‌های `patient/doctor/appointment/notification` با مرزهای `API/Application/Domain/Infrastructure` و ruleهای dependency پیاده شوند.
+- [ ] `Phase 4 - Security First`: authentication/authorization در ورودی API و application serviceها enforce و تست شوند.
+- [ ] `Phase 5 - Concurrency & Consistency`: سناریوهای race condition رزرو/جابجایی با تست موازی خودکار پوشش داده شوند.
+- [ ] `Phase 6 - Observability`: استاندارد لاگ، request-id/trace-id، audit eventها و health checks قبل از UAT فعال شوند.
+- [ ] `Phase 7 - CI Quality Gates`: build, unit/integration tests, API contract checks, migration checks و static analysis اجباری شوند.
+- [ ] `Phase 8 - Release Readiness`: checklist استقرار `dev/test/prod` + rollback + seed data + runbook تکمیل شود.
+
 ---
 
 ## Should
@@ -96,10 +134,11 @@
 ### 11) ADRهای تکمیلی
 
 - [ ] ADR مربوط به authentication/authorization ثبت شود.
-- [ ] ADR مربوط به concurrency control و booking consistency ثبت شود.
+- [x] ADR مربوط به concurrency control و booking consistency ثبت شود.
+- [x] ADR مربوط به technology stack (`Java 21`, `Spring Boot 3.x`, `PostgreSQL`, `Redis`, `Spring Modulith`) ثبت شود.
 - [ ] ADR مربوط به notification architecture ثبت شود.
 - [ ] ADR مربوط به data model / storage choices ثبت شود.
-- [ ] ADR مربوط به background jobs / queue / worker ثبت شود.
+- [ ] ADR مربوط به الگوی اجرای async/background jobs در MVP (in-process یا queue-based) ثبت شود.
 
 ### 12) معماری اجرایی قابل پیاده‌سازی
 
@@ -121,6 +160,7 @@
 - [ ] نگاشت `Interview -> SRS -> FR/NFR -> Domain -> API -> Test` ایجاد شود.
 - [ ] acceptance criteria هر capability به سناریوهای تست قابل تبدیل شود.
 - [ ] matrix تست برای رزرو همزمان، لغو، reschedule و authorization تهیه شود.
+- [ ] matrix تست به CI متصل و به‌عنوان quality gate اجباری شود.
 
 ---
 
@@ -158,14 +198,18 @@
 
 وقتی موارد زیر تکمیل شوند، AKB برای شروع تولید سورس در وضعیت قابل قبول قرار می‌گیرد:
 
-- [ ] contextها و context map نهایی شده باشند.
-- [ ] business ruleهای رزرو، لغو و reschedule بدون ابهام باشند.
-- [ ] state machineها کامل و قابل تست باشند.
-- [ ] ماتریس نقش/مجوز نهایی شده باشد.
-- [ ] API contractهای MVP آماده باشند.
-- [ ] مدل داده و constraintهای ضد double-booking مشخص باشند.
-- [ ] use caseهای end-to-end و exception flowهای اصلی ثبت شده باشند.
+- [x] contextها و context map نهایی شده باشند.
+- [x] business ruleهای رزرو، لغو و reschedule بدون ابهام باشند.
+- [x] state machineها کامل و قابل تست باشند.
+- [x] ماتریس نقش/مجوز نهایی شده باشد.
+- [x] API contractهای MVP آماده باشند.
+- [x] مدل داده و constraintهای ضد double-booking مشخص باشند.
+- [x] use caseهای end-to-end و exception flowهای اصلی ثبت شده باشند.
 - [ ] ADRهای تصمیمات حیاتی فنی ثبت شده باشند.
+- [ ] bootstrap فنی ریپو (build, src layout, DB migration, CI) آماده باشد.
+- [ ] ناهمخوانی‌های بین اسناد معماری/API رفع شده باشد.
+- [ ] ابهام‌های تحلیلی اثرگذار بر کد (FRهای باز) بسته شده باشد.
+- [ ] خط سیر استاندارد تولید کد (Phase 0 تا Phase 8) دارای artifact و gate قابل‌سنجش باشد.
 
 ---
 
