@@ -1,5 +1,21 @@
 # REST API Standard
 
+## 0. Implementation Profile (MVP)
+
+این سند برای MVP با پروفایل فنی زیر اعمال می‌شود:
+
+* `Java 21`
+* `Spring Boot 3.x`
+* `Spring Modulith` (برای مرزبندی ماژول‌ها در Monolith)
+* `PostgreSQL` به‌عنوان منبع حقیقت داده‌های بیزنسی
+* `Redis` برای cache و داده‌های کوتاه‌عمر
+
+قواعد اجرایی:
+
+* قرارداد API مستقل از فریم‌ورک باقی می‌ماند، اما پیاده‌سازی مرجع در Spring Boot انجام می‌شود.
+* عملیات حساس رزرو/لغو/جابجایی باید روی تراکنش‌های PostgreSQL تکیه کنند؛ cache نباید جایگزین invariantهای دیتابیس شود.
+* زمان‌ها در API باید `RFC 3339 / ISO-8601` و بر مبنای UTC (`Z`) باشند.
+
 ## 1. Base URL
 
 ```text
@@ -627,6 +643,12 @@ Example:
 POST /payments
 Idempotency-Key: 01JABC123
 ```
+
+الزام اجرایی برای MVP:
+
+* برای endpointهای حساس مثل `POST /appointments` و `POST /appointments/{appointmentId}/reschedule` ارسال `Idempotency-Key` اجباری است.
+* کلید باید حداقل در سطح `(actorId + endpoint + key)` یکتا در بازه زمانی معتبر باشد.
+* نتیجه idempotent request (success یا failure قطعی) باید قابل بازیابی باشد؛ نگه‌داری موقت آن می‌تواند در `Redis` با TTL مشخص انجام شود.
 
 ---
 

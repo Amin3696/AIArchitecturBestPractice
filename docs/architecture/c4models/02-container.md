@@ -14,10 +14,9 @@ System_Ext(sms, "SMS Provider")
 System_Ext(email, "Email Provider")
 
 Container(web, "Web App", "SPA", "Unified web UI for patients, doctors, receptionists, clinic admins, and system admins")
-Container(api, "Backend API", "API-centric Modular Monolith", "Exposes REST endpoints and contains Patient, Doctor, Appointment, and Notification modules")
+Container(api, "Backend API", "Java 21 + Spring Boot 3 + Spring Modulith", "Exposes REST endpoints and contains Patient, Doctor, Appointment, and Notification modules")
 ContainerDb(db, "PostgreSQL", "Transactional relational database", "Stores business data, audit data, and configuration")
-Container(redis, "Redis", "Redis + BullMQ backend", "Supports background job queueing and short-lived operational caching")
-Container(worker, "Background Worker", "Node.js worker", "Processes notification and reminder jobs asynchronously")
+Container(redis, "Redis", "Operational cache", "Caches short-lived operational data such as hot reads, rate-limit windows, and token/session metadata")
 
 Rel(patient, web, "Uses")
 Rel(doctor, web, "Uses")
@@ -28,15 +27,14 @@ Rel(systemAdmin, web, "Uses")
 Rel(web, api, "Calls REST API over HTTPS")
 
 Rel(api, db, "Reads/Writes transactional data")
-Rel(api, redis, "Enqueues async jobs and uses operational cache")
-Rel(worker, redis, "Consumes BullMQ jobs")
-Rel(worker, db, "Reads/Writes job-relevant business data")
-Rel(worker, sms, "Sends SMS notifications")
-Rel(worker, email, "Sends email notifications")
+Rel(api, redis, "Reads/Writes short-lived cache entries")
+Rel(api, sms, "Sends SMS notifications")
+Rel(api, email, "Sends email notifications")
 ```
 
 ## Notes
 
 - `Payment Gateway` از container diagram حذف شده چون در MVP خارج از scope است.
-- `Redis` در baseline فعلی منبع حقیقت رزرو نیست و به‌عنوان queue backend / cache عملیاتی مدل شده است.
+- `Redis` در baseline فعلی منبع حقیقت رزرو نیست و فقط برای cache عملیاتی استفاده می‌شود.
+- پردازش‌های async مانند reminder/notification داخل همان `Backend API` (runtime مشترک Modular Monolith) اجرا می‌شوند و در MVP به worker مستقل Node.js نیاز نداریم.
 - invariantهای جلوگیری از double booking در لایه `Backend API` و پایگاه داده تراکنشی enforce می‌شوند.
