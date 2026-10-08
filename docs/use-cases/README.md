@@ -4,11 +4,11 @@
 
 ## فهرست
 
-- [UC-01 رزرو نوبت](UC-01-book-appointment.md)
-- [UC-02 لغو نوبت](UC-02-cancel-appointment.md)
-- [UC-03 جابه‌جایی نوبت](UC-03-reschedule-appointment.md)
-- [UC-04 مدیریت برنامه پزشک](UC-04-doctor-schedule-management.md)
-- [UC-05 Notification و Reminder](UC-05-notification-reminder.md)
+- [UC-0001 رزرو نوبت](UC-0001-book-appointment)
+- [UC-0002 لغو نوبت](UC-0002-cancel-appointment)
+- [UC-0003 جابه‌جایی نوبت](UC-0003-reschedule-appointment)
+- [UC-0004 مدیریت برنامه پزشک](UC-0004-doctor-schedule-management)
+- [UC-0005 Notification و Reminder](UC-0005-notification-reminder)
 - [Exception Flowهای حیاتی (Concurrency / Authorization)](EX-critical-concurrency-and-authorization.md)
 
 ## سند Template

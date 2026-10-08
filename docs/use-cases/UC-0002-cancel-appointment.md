@@ -1,4 +1,4 @@
-# UC-02: لغو نوبت (Cancel Appointment)
+# UC-0002: لغو نوبت (Cancel Appointment)
 
 ## هدف
 
