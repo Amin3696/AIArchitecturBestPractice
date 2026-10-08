@@ -521,7 +521,7 @@ Response `200`:
 
 - `POST /appointments`
 - Roles: `PATIENT` (self), `RECEPTIONIST`, `CLINIC_ADMIN`
-- Idempotency: **required** (`X-Idempotency-Key`)
+- Idempotency: **required** (`Idempotency-Key`)
 
 Request:
 
@@ -613,7 +613,7 @@ Errors:
 
 - `POST /appointments/{appointmentId}/reschedule`
 - Roles: owner `PATIENT`, `RECEPTIONIST`, `CLINIC_ADMIN`
-- Idempotency: **required** (`X-Idempotency-Key`)
+- Idempotency: **required** (`Idempotency-Key`)
 
 Request:
 
@@ -772,7 +772,7 @@ Response `200`:
 
 ## 6.1 Header Contract
 
-- Header: `X-Idempotency-Key: <uuid-or-random-string>`
+- Header: `Idempotency-Key: <uuid-or-random-string>`
 - Key length: 8..128
 - Scope: `method + path + actorId`
 - TTL نگهداری نتیجه: 24 ساعت

@@ -88,12 +88,13 @@
 
 ### B) هم‌ترازی اسناد قبل از تولید سورس
 
-- [ ] مرجعیت `docs/akb-baseline.md` با فایل‌های واقعی ADR هم‌تراز شود (نام فایل‌ها و وضعیت‌ها به‌روزرسانی شود).
-- [ ] `C4 Level 3 Backend Components` با استک جدید هم‌راستا شود (حذف ارجاع `Node.js/BullMQ worker` در صورت عدم استفاده در MVP).
-- [ ] نام هدر idempotency در اسناد یکسان شود (`Idempotency-Key` در مقابل `X-Idempotency-Key`).
+- [x] مرجعیت `docs/akb-baseline.md` با فایل‌های واقعی ADR هم‌تراز شود (نام فایل‌ها و وضعیت‌ها به‌روزرسانی شود).
+- [x] `C4 Level 3 Backend Components` با استک جدید هم‌راستا شود (حذف ارجاع `Node.js/BullMQ worker` در صورت عدم استفاده در MVP).
+- [x] نام هدر idempotency در اسناد یکسان شود (`Idempotency-Key` در مقابل `X-Idempotency-Key`).
 
 ### C) بستن ابهام‌های تحلیلی قبل از تولید سورس
 
+- [ ] رسیدگی آیتم‌به‌آیتم طبق چک‌لیست `docs/requirements/ambiguities-resolution-checklist.md` انجام شود.
 - [ ] ابهام‌های FR باز که روی طراحی اثر مستقیم دارند بسته شوند (حداقل: `FR-04`, `FR-06`, `FR-14`, `FR-16`, `FR-36`, `FR-40`, `FR-43`, `FR-51`).
 - [ ] تکلیف کانال `Push Notification` برای MVP به‌صورت قطعی مشخص شود (`in-scope` یا `out-of-scope`).
 - [ ] سیاست دقیق Reminder نهایی شود (زمان‌بندی ارسال، تعداد دفعات، cutoff، timezone evaluation).

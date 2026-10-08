@@ -1,8 +1,8 @@
 # AKB Baseline
 
-**Baseline Version:** 1.0  
+**Baseline Version:** 1.1  
 **Status:** Reviewed Baseline  
-**Last Updated:** 2026-10-01  
+**Last Updated:** 2026-10-08  
 **Purpose:** تعیین baseline اولیه برای ساختار مستندات، اسناد authoritative، ترتیب رفع تعارض و وضعیت/نسخه اسناد کلیدی برای تولید سورس.
 
 ---
@@ -37,7 +37,7 @@
 | نیازمندی‌های غیرعملکردی | `docs/requirements/non-functional-requirements.md` | فهرست کاری NFRها و معیارهای پذیرش |
 | کاربران و ذی‌نفعان | `docs/requirements/users-stakeholders.md` | مرجع بازیگران اصلی و ذی‌نفعان |
 | استاندارد API | `docs/api/rest-api-standards.md` | مرجع استانداردهای طراحی REST API |
-| تصمیمات معماری | `docs/architecture/decisions/ADR-0001-modular-monolith-architecture.md` | مرجع تصمیم ثبت‌شده درباره سبک معماری |
+| تصمیمات معماری | `docs/architecture/decisions/ADR-0001-modular-monolith-architecture.md`، `docs/architecture/decisions/ADR-0002-booking-consistency-and-concurrency-control.md`، `docs/architecture/decisions/ADR-0003-technology-stack-for-mvp.md` | مراجع تصمیم‌های معماری ثبت‌شده (سبک معماری، سازگاری رزرو، استک فناوری) |
 | نمای سطح بالا معماری | `docs/architecture/c4models/01-system-context.md` | مرجع نمای Context سیستم |
 | نمای کانتینر معماری | `docs/architecture/c4models/02-container.md` | مرجع نمای Container سیستم |
 
@@ -78,7 +78,7 @@
 | سند                                                                                  | نسخه | وضعیت             | نوع مرجع               | توضیح                                                        |
 | ------------------------------------------------------------------------------------ | ---- | ----------------- | ---------------------- | ------------------------------------------------------------ |
 | `docs/README.md`                                                                     | 1.0  | Reviewed          | Authoritative          | ساختار و سیاست نگه‌داری مستندات                              |
-| `docs/akb-baseline.md`                                                               | 1.0  | Reviewed Baseline | Authoritative          | baseline فعلی AKB و مرجع رفع تعارض                           |
+| `docs/akb-baseline.md`                                                               | 1.1  | Reviewed Baseline | Authoritative          | baseline فعلی AKB و مرجع رفع تعارض                           |
 | `docs/requirements/srs/srs.md`                                                       | 1.0  | Draft             | Authoritative          | نیازمندی‌های رسمی سیستم                                      |
 | `docs/requirements/functional-requirements.md`                                       | 0.1  | Working Draft     | Supporting             | FRهای کاری و ابهام‌ها                                        |
 | `docs/requirements/non-functional-requirements.md`                                   | 0.1  | Working Draft     | Supporting             | NFRهای کاری و معیارهای اولیه                                 |
@@ -86,6 +86,7 @@
 | `docs/api/rest-api-standards.md`                                                     | 1.0  | Draft Standard    | Authoritative          | استاندارد طراحی REST API                                     |
 | `docs/architecture/decisions/ADR-0001-modular-monolith-architecture.md`               | 1.0  | Proposed          | Authoritative in Scope | تصمیم معماری ثبت‌شده برای سبک سیستم                          |
 | `docs/architecture/decisions/ADR-0002-booking-consistency-and-concurrency-control.md` | 1.0  | Accepted          | Authoritative in Scope | تصمیم معماری برای جلوگیری از double booking و atomicity رزرو |
+| `docs/architecture/decisions/ADR-0003-technology-stack-for-mvp.md`                    | 1.0  | Accepted          | Authoritative in Scope | تصمیم معماری برای انتخاب استک فناوری MVP                     |
 | `docs/architecture/c4models/01-system-context.md`                                    | 0.1  | Working Draft     | Supporting             | نمای سطح بالا از بازیگران و سیستم                            |
 | `docs/architecture/c4models/02-container.md`                                         | 0.1  | Working Draft     | Supporting             | نمای کانتینرها و اجزای اجرایی                                |
 | `docs/architecture/domain/context-map.md`                                            | 0.5  | Working Draft     | Supporting             | نقشه فعلی bounded contextها و روابط آن‌ها                    |
