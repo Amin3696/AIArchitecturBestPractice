@@ -14,7 +14,7 @@
 
 ### Trace
 
-- ADR: `ADR0002`
+- ADR: `ADR-0002`
 - FR: `FR-22`
 
 ---

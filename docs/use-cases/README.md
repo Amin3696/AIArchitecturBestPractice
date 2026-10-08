@@ -21,4 +21,4 @@
 - `docs/api/mvp-api-contract.md`
 - `docs/architecture/domain/state-machines.md`
 - `docs/architecture/domain/access-control-matrix.md`
-- `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md`
+- `docs/architecture/decisions/ADR-0002-booking-consistency-and-concurrency-control.md`

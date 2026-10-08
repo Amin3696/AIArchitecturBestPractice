@@ -296,4 +296,4 @@ WHERE appointment_status = 'BOOKED';
 - `docs/architecture/domain/contexts/doctor/context-spec.md`
 - `docs/architecture/domain/contexts/patient/context-spec.md`
 - `docs/architecture/domain/contexts/notification/context-spec.md`
-- `docs/architecture/decisions/ADR0002-booking-consistency-and-concurrency-control.md`
+- `docs/architecture/decisions/ADR-0002-booking-consistency-and-concurrency-control.md`
